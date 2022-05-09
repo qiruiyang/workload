@@ -36,6 +36,8 @@ function clean_env()
 
 	sleep 1
 
+	sudo rmmod rmem 2>/dev/null
+	sudo insmod $RMEM
 	cgdelete cpuset,memory:rmem
 }
 
@@ -61,14 +63,23 @@ echo $global_mem_limit > /sys/fs/cgroup/memory/rmem/memory.limit_in_bytes
 echo 1 > /sys/fs/cgroup/memory/rmem/memory.swappiness
 
 # set local memory limit and start execution
+echo 1 > /proc/rmem/enabled
 echo $local_mem_limit > /proc/rmem/limit
 
 if [ $1 == "mysql" ]; then
-	cgexec -g cpuset,memory:rmem $mysqlcmd
+	echo mysqld > /proc/rmem/stat
+	cgexec -g cpuset,memory:rmem $mysqldcmd &
+	$mysqldwl
 elif [ $1 == "ffmpeg" ]; then
+	echo ffmpeg > /proc/rmem/stat
 	cgexec -g cpuset,memory:rmem $ffmpegcmd
 elif [ $1 == "redis" ]; then
-	cgexec -g cpuset,memory:rmem $rediscmd
+	echo redis-server > /proc/rmem/stat
+	cgexec -g cpuset,memory:rmem $rediscmd &
+	$rediswl
+elif [ $1 == "mlperf" ]; then
+	echo mlperf > /proc/rmem/stat
+	cgexec -g cpuset,memory:rmem $mlperfcmd
 else
 	echo not supported
 fi

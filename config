@@ -4,19 +4,6 @@ mems="0-1"
 global_mem_limit=$((1024 * 1024 * 1024))
 local_mem_limit=$((256 * 1024 * 1024))
 
-RMEM=~/rmem.ko
-
-FFMPEG=
-REDIS=
-MYSQLD=
-MLPERF=
-
-ffmpegcmd="$FFMPEG -nostdin -y -i /tmp/big_buck_bunny_1080p_h264.mov -vcodec libx264 output_0.264"
-
-mlperfcmd="$MLPERF "
-
-rediscmd="$REDIS "
-rediswl=""
-
-mysqldcmd="$MYSQLD "
-mysqldwl="./tpcc.lua --mysql-socket=/tmp/mysql.sock --mysql-user=root --mysql-db=tpcc --threads=`nproc` --tables=1 --scale=10 prepare && sleep 10 && "
+ffmpegcmd="ffmpeg/ffmpeg -nostdin -y -i /tmp/big_buck_bunny_1080p_h264.mov -vcodec libx264 output_0.264"
+mysqlcmd="mysql/mysqld --defaults-file=/tmp/mysql/my.cnf --initialize --user=mysql"
+rediscmd=""
