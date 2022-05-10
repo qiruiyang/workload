@@ -1,9 +1,16 @@
-node=1
+cpus="0-9"
 mems="0-1"
 
-global_mem_limit=$((1024 * 1024 * 1024))
-local_mem_limit=$((256 * 1024 * 1024))
+drop_cache_script="/home/rui/work/drop_cache.sh"
 
-ffmpegcmd="ffmpeg/ffmpeg -nostdin -y -i /tmp/big_buck_bunny_1080p_h264.mov -vcodec libx264 output_0.264"
+rmem_path="/home/rui/work/linux/emulator"
+
+global_mem_limit=$((1100 * 1024 * 1024))
+
+local_mem_limit=$((520 * 1024 * 1024))
+
+ffmpegcmd="/home/rui/ffmpeg -nostdin -y -i /home/rui/big_buck_bunny_1080p_h264.mov -vcodec libx264 /tmp/output_0.264"
+
 mysqlcmd="mysql/mysqld --defaults-file=/tmp/mysql/my.cnf --initialize --user=mysql"
+
 rediscmd=""

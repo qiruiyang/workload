@@ -20,6 +20,7 @@ fi
 function clean_env()
 {
 
+	sudo $drop_cache_script
 	if [[ -e /sys/fs/cgroup/memory/rmem ]]; then
 		pids=$(cat /sys/fs/cgroup/memory/rmem/tasks)
 		if [[ ! -z ${pids} ]]; then
@@ -36,8 +37,6 @@ function clean_env()
 
 	sleep 1
 
-	sudo rmmod rmem 2>/dev/null
-	sudo insmod $RMEM
 	cgdelete cpuset,memory:rmem
 }
 
@@ -52,7 +51,6 @@ source config
 clean_env
 
 # setup CPU affinity
-cpus=$(numactl --hardware | grep "node ${node} cpus" | awk '{print $4"-"$NF}')
 mkdir /sys/fs/cgroup/cpuset/rmem
 echo $mems > /sys/fs/cgroup/cpuset/rmem/cpuset.mems
 echo $cpus > /sys/fs/cgroup/cpuset/rmem/cpuset.cpus
@@ -63,6 +61,12 @@ echo $global_mem_limit > /sys/fs/cgroup/memory/rmem/memory.limit_in_bytes
 echo 1 > /sys/fs/cgroup/memory/rmem/memory.swappiness
 
 # set local memory limit and start execution
+cd $rmem_path
+make clean && make
+sudo rmmod rmem 2>/dev/null
+sudo insmod rmem.ko
+cd -
+
 echo 1 > /proc/rmem/enabled
 echo $local_mem_limit > /proc/rmem/limit
 
